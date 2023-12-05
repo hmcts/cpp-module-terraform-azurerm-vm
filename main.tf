@@ -39,11 +39,6 @@ data "azurerm_storage_account" "storeacc" {
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
-data "azurerm_network_security_group" "vm" {
-  name                = var.nsg_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
 resource "random_password" "passwd" {
   count       = (var.os_flavor == "linux" && var.disable_password_authentication == false && var.admin_password == null ? 1 : (var.os_flavor == "windows" && var.admin_password == null ? 1 : 0))
   length      = var.random_password_length
@@ -402,7 +397,7 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
   count                      = var.storage_account_name != null && var.log_analytics_workspace_id != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
-  target_resource_id         = data.azurerm_network_security_group.vm.id
+  target_resource_id         = var.existing_network_security_group_id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = var.log_analytics_workspace_id
 

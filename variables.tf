@@ -112,11 +112,6 @@ variable "existing_network_security_group_id" {
   default     = null
 }
 
-variable "nsg_inbound_rules" {
-  description = "List of network rules to apply to network interface."
-  default     = []
-}
-
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
   default     = ""
@@ -751,11 +746,6 @@ variable "log_analytics_workspace_primary_shared_key" {
 
 variable "storage_account_name" {
   description = "The name of the hub storage account to store logs"
-  default     = null
-}
-
-variable "nsg_name" {
-  description = "The name of the network security group"
   default     = null
 }
 

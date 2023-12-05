@@ -43,22 +43,6 @@ module "virtual-machine" {
   enable_vm_availability_set       = false
   enable_public_ip_address         = false
 
-  # Network Seurity group port allow definitions for each Virtual Machine
-  # NSG association to be added automatically for all network interfaces.
-  # Remove this NSG rules block, if `existing_network_security_group_id` is specified
-  nsg_inbound_rules = [
-    {
-      name                   = "ssh"
-      destination_port_range = "22"
-      source_address_prefix  = "*"
-    },
-    {
-      name                   = "http"
-      destination_port_range = "80"
-      source_address_prefix  = "*"
-    },
-  ]
-
   # Boot diagnostics to troubleshoot virtual machines, by default uses managed
   # To use custom storage account, specify `storage_account_name` with a valid name
   # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
