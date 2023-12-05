@@ -6,7 +6,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
-func TestTerraformVMSS(t *testing.T) {
+func TestTerraformVM(t *testing.T) {
 	t.Parallel()
 
 	terraformOptions := &terraform.Options{
