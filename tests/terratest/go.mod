@@ -1,4 +1,4 @@
-module github.com/cpp-module-terraform-azurerm-vmss
+module github.com/cpp-module-terraform-azurerm-vm
 
 go 1.18
 

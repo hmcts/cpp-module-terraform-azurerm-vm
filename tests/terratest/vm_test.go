@@ -4,8 +4,6 @@ import (
 	"testing"
     "github.com/stretchr/testify/assert"
 	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/gruntwork-io/terratest/modules/azure"
-	"fmt"
 )
 
 func TestTerraformVMSS(t *testing.T) {
@@ -27,5 +25,5 @@ func TestTerraformVMSS(t *testing.T) {
 	// // Assert inputs with outputs
 	outputs_vm_name := terraform.Output(t, terraformOptions, "linux_virtual_machine_names")
 	elem := outputs_vm_name[0]
-	assert.Equal(t, "linux-vm", outputs_vm_name)
+	assert.Equal(t, "linux-vm", elem)
 }
