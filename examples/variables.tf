@@ -10,10 +10,6 @@ variable "location" {
   description = "description"
 }
 
-variable "tags" {
-  type = map(string)
-}
-
 variable "subnet_config" {
   type        = map(string)
   default     = {}
