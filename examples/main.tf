@@ -17,11 +17,12 @@ module "virtual-machine" {
   source = "../"
 
   # Resource Group, location, VNet and Subnet details
-  resource_group_name  = azurerm_resource_group.vm.name
-  location             = var.location
-  virtual_network_name = var.subnet_config.virtual_network_name
-  subnet_name          = azurerm_subnet.vm.name
-  virtual_machine_name = "vm-linux"
+  resource_group_name     = azurerm_resource_group.vm.name
+  location                = var.location
+  virtual_network_name    = var.subnet_config.virtual_network_name
+  virtual_network_rg_name = var.subnet_config.resource_group_name
+  subnet_name             = azurerm_subnet.vm.name
+  virtual_machine_name    = "vm-linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Check the README.md file for more pre-defined images for Ubuntu, Centos, RedHat.

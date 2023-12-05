@@ -13,6 +13,11 @@ variable "virtual_network_name" {
   default     = ""
 }
 
+variable "virtual_network_rg_name" {
+  description = "The name of the virtual network resource group"
+  default     = ""
+}
+
 variable "subnet_name" {
   description = "The name of the subnet to use in VM scale set"
   default     = ""
