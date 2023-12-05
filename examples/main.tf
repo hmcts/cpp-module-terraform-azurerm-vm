@@ -84,4 +84,5 @@ module "virtual-machine" {
     ProjectName = "cpp-module-terraform-azurerm-vm"
     Env         = "lab"
   }
+  depends_on = [azurerm_resource_group.vm,azurerm_subnet.vm]
 }

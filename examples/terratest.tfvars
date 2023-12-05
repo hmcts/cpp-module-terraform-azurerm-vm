@@ -1,4 +1,4 @@
-resource_group_name = "RG-LAB-TF-TEST-VMSS-01"
+resource_group_name = "RG-LAB-TF-TEST-VM-01"
 location            = "uksouth"
 
 subnet_config = {
