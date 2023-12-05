@@ -51,11 +51,6 @@ output "windows_virtual_machine_ids" {
   value       = module.virtual-machine.windows_virtual_machine_ids
 }
 
-output "network_security_group_ids" {
-  description = "List of Network security groups and ids"
-  value       = module.virtual-machine.network_security_group_ids
-}
-
 output "vm_availability_set_id" {
   description = "The resource ID of Virtual Machine avilability set"
   value       = module.virtual-machine.vm_availability_set_id

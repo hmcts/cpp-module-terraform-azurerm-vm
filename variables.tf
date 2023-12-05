@@ -754,6 +754,11 @@ variable "storage_account_name" {
   default     = null
 }
 
+variable "nsg_name" {
+  description = "The name of the network security group"
+  default     = null
+}
+
 variable "deploy_log_analytics_agent" {
   description = "Install log analytics agent to windows or linux VM"
   default     = false
