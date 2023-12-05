@@ -393,24 +393,18 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 #--------------------------------------
 # azurerm monitoring diagnostics
 #--------------------------------------
-
-resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.storage_account_name != null && var.log_analytics_workspace_id != null ? 1 : 0
-  name                       = lower("nsg-${var.virtual_machine_name}-diag")
-  target_resource_id         = var.existing_network_security_group_id
+resource "azurerm_monitor_diagnostic_setting" "vmdiag" {
+  count                      = var.log_analytics_workspace_id != null && var.storage_account_name != null ? var.instances_count : 0
+  name                       = lower("${var.virtual_machine_name}-diag")
+  target_resource_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
-  dynamic "log" {
-    for_each = var.nsg_diag_logs
-    content {
-      category = log.value
-      enabled  = true
+  metric {
+    category = "AllMetrics"
 
-      retention_policy {
-        enabled = false
-        days    = 0
-      }
+    retention_policy {
+      enabled = false
     }
   }
 }

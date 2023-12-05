@@ -60,3 +60,8 @@ output "linux_virtual_machine_scale_set_name" {
   description = "The name of the Linux Virtual Machine Scale Set."
   value       = module.virtual-machine.linux_virtual_machine_names
 }
+
+output "linux_virtual_machine_names" {
+  description = "The resource id's of all Linux Virtual Machine."
+  value       = module.virtual-machine.linux_virtual_machine_names
+}
