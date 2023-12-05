@@ -1,15 +1,26 @@
 provider "azurerm" {
   features {}
 }
+resource "azurerm_resource_group" "vm" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
+resource "azurerm_subnet" "vm" {
+  name                 = var.subnet_config.name
+  resource_group_name  = var.subnet_config.resource_group_name
+  virtual_network_name = var.subnet_config.virtual_network_name
+  address_prefixes     = [var.subnet_config.address_prefixes]
+}
 
 module "virtual-machine" {
   source = "../"
 
   # Resource Group, location, VNet and Subnet details
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = azurerm_resource_group.vm.name
   location             = var.location
   virtual_network_name = var.subnet_config.virtual_network_name
-  subnet_name          = var.subnet_config.name
+  subnet_name          = azurerm_subnet.vm.name
   virtual_machine_name = "vm-linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
