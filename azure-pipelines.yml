@@ -9,7 +9,7 @@ resources:
       type: github
       name: hmcts/cpp-azure-devops-templates
       ref: 'main'
-      endpoint: 'cpp-apps'
+      endpoint: 'hmcts'
 
 extends:
   template: pipelines/terratest.yaml@cppAzureDevOpsTemplates
