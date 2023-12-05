@@ -23,7 +23,6 @@ func TestTerraformVM(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// // Assert inputs with outputs
-	outputs_vm_name := terraform.Output(t, terraformOptions, "linux_virtual_machine_names")
-	elem := outputs_vm_name[0]
-	assert.Equal(t, "linux-vm", elem)
+	outputs_vm_name := terraform.Output(t, terraformOptions, "linux_virtual_machine_name")
+	assert.Equal(t, "linux-vm", outputs_vm_name)
 }
