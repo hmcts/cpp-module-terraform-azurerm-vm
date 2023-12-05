@@ -66,4 +66,8 @@ module "virtual-machine" {
     }
   ]
   deploy_log_analytics_agent = false
+  tags = {
+    ProjectName  = "cpp-module-terraform-azurerm-vm"
+    Env          = "lab"
+  }
 }
