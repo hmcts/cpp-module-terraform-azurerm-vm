@@ -1,9 +1,22 @@
 locals {
-  vm_data_disks = { for idx, data_disk in var.data_disks : data_disk.name => {
-    idx : idx,
-    data_disk : data_disk,
-    }
-  }
+  vm_details = flatten([
+    for k, inst in azurerm_linux_virtual_machine.linux_vm : [
+      {
+        vmname = inst.name
+        vmid   = inst.id
+      }
+    ]
+  ])
+  vm_data_disks = flatten([
+    for vm in local.vm_details : [
+      for idx, disk in var.data_disks : {
+        vmname = vm.vmname
+        vmid = vm.vmid
+        idx = idx
+        data_disk = disk
+      }
+    ]
+  ])
 }
 
 #---------------------------------------------------------------
@@ -29,7 +42,7 @@ data "azurerm_virtual_network" "vnet" {
 
 data "azurerm_subnet" "snet" {
   name                 = var.subnet_name
-  virtual_network_name = data.azurerm_virtual_network.vnet.name
+  virtual_network_name = var.virtual_network_name
   resource_group_name  = var.virtual_network_rg_name
 }
 
@@ -81,8 +94,8 @@ resource "azurerm_public_ip" "pip" {
 resource "azurerm_network_interface" "nic" {
   count                         = var.instances_count
   name                          = var.instances_count == 1 ? lower("nic-${format("vm%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")))}") : lower("nic-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}")
-  resource_group_name           = data.azurerm_resource_group.rg.name
-  location                      = data.azurerm_resource_group.rg.location
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
   dns_servers                   = var.dns_servers
   enable_ip_forwarding          = var.enable_ip_forwarding
   enable_accelerated_networking = var.enable_accelerated_networking
@@ -149,8 +162,8 @@ resource "azurerm_availability_set" "aset" {
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                           = var.os_flavor == "linux" ? var.instances_count : 0
   name                            = var.instances_count == 1 ? substr(var.virtual_machine_name, 0, 64) : substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64)
-  resource_group_name             = data.azurerm_resource_group.rg.name
-  location                        = data.azurerm_resource_group.rg.location
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
   size                            = var.virtual_machine_size
   admin_username                  = var.admin_username
   admin_password                  = var.disable_password_authentication == false && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
@@ -191,7 +204,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     disk_encryption_set_id    = var.disk_encryption_set_id
     disk_size_gb              = var.disk_size_gb
     write_accelerator_enabled = var.enable_os_disk_write_accelerator
-    name                      = var.os_disk_name
+    name                      = "${var.os_disk_name}-${count.index}"
   }
 
   additional_capabilities {
@@ -314,10 +327,10 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 # Virtual machine data disks
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
-  for_each             = local.vm_data_disks
-  name                 = "${var.virtual_machine_name}_DataDisk_${each.value.idx}"
-  resource_group_name  = data.azurerm_resource_group.rg.name
-  location             = data.azurerm_resource_group.rg.location
+  for_each             = { for obj in local.vm_data_disks : "${obj.vmname}_${obj.idx}" => obj }
+  name                 = "${each.value.vmname}_DataDisk_${each.value.idx}"
+  resource_group_name  = var.resource_group_name
+  location             = var.location
   storage_account_type = lookup(each.value.data_disk, "storage_account_type", "StandardSSD_LRS")
   create_option        = "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
@@ -331,9 +344,9 @@ resource "azurerm_managed_disk" "data_disk" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
-  for_each           = local.vm_data_disks
-  managed_disk_id    = azurerm_managed_disk.data_disk[each.key].id
-  virtual_machine_id = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm[0].id : azurerm_linux_virtual_machine.linux_vm[0].id
+  for_each           = { for obj in local.vm_data_disks : "${obj.vmname}_${obj.idx}" => obj }
+  managed_disk_id    = azurerm_managed_disk.data_disk["${each.value.vmname}_${each.value.idx}"].id
+  virtual_machine_id = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm[0].id : each.value.vmid
   lun                = each.value.idx
   caching            = "ReadWrite"
 }

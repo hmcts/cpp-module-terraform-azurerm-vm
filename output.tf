@@ -60,3 +60,11 @@ output "vm_availability_set_id" {
   description = "The resource ID of Virtual Machine availability set"
   value       = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
 }
+
+output "vm_details" {
+  value = local.vm_details
+}
+
+output "vm_disk" {
+  value = local.vm_data_disks
+}
