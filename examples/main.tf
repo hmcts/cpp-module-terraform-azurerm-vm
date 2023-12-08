@@ -52,6 +52,7 @@ module "virtual-machine" {
   # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
   # or `UltraSSD_LRS` (UltraSSD_LRS only available in a region that support availability zones)
   # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
+  os_disk_name = "test"
   data_disks = [
     {
       name                 = "disk1"
