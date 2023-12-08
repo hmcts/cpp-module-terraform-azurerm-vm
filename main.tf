@@ -10,9 +10,9 @@ locals {
   vm_data_disks = flatten([
     for vm in local.vm_details : [
       for idx, disk in var.data_disks : {
-        vmname = vm.vmname
-        vmid = vm.vmid
-        idx = idx
+        vmname    = vm.vmname
+        vmid      = vm.vmid
+        idx       = idx
         data_disk = disk
       }
     ]
