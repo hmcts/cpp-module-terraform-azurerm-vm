@@ -19,7 +19,12 @@ variable "virtual_network_rg_name" {
 }
 
 variable "subnet_name" {
-  description = "The name of the subnet to use in VM scale set"
+  description = "The name of the subnet to use in VM "
+  default     = ""
+}
+
+variable "subnet_id" {
+  description = "The name of the subnet to use in VM "
   default     = ""
 }
 
