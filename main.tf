@@ -2,7 +2,7 @@ locals {
   vm_details = flatten([
     for k, inst in azurerm_linux_virtual_machine.linux_vm : [
       {
-        vmname = inst.name
+        vmname = replace(inst.name, ".${var.dns_zone_name}", "")
         vmid   = inst.id
       }
     ]
@@ -63,6 +63,28 @@ resource "random_password" "passwd" {
   keepers = {
     admin_password = var.virtual_machine_name
   }
+}
+
+# Write to key vault
+resource "azurerm_key_vault_secret" "ssh_public_key" {
+  count        = var.generate_admin_ssh_key == true ? 1 : 0
+  name         = "${var.virtual_machine_name}-ssh-public-key"
+  value        = tls_private_key.rsa[0].public_key_openssh
+  key_vault_id = var.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "ssh_private_key" {
+  count        = var.generate_admin_ssh_key == true ? 1 : 0
+  name         = "${var.virtual_machine_name}--vmss-ssh-private-key"
+  value        = tls_private_key.rsa[0].private_key_pem
+  key_vault_id = var.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "password" {
+  count        = var.disable_password_authentication != true && var.admin_password == null ? 1 : 0
+  name         = "${var.virtual_machine_name}--vmss-admin-password"
+  value        = random_password.passwd[0].result
+  key_vault_id = var.key_vault_id
 }
 
 #-----------------------------------
@@ -161,7 +183,7 @@ resource "azurerm_availability_set" "aset" {
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                           = var.os_flavor == "linux" ? var.instances_count : 0
-  name                            = var.instances_count == 1 ? substr(var.virtual_machine_name, 0, 64) : substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64)
+  name                            = var.instances_count == 1 ? format("%s%s", substr(var.virtual_machine_name, 0, 64), ".${var.dns_zone_name}") : format("%s%s",substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64), ".${var.dns_zone_name}")
   resource_group_name             = var.resource_group_name
   location                        = var.location
   size                            = var.virtual_machine_size

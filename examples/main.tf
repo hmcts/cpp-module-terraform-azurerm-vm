@@ -13,6 +13,11 @@ resource "azurerm_subnet" "vm" {
   address_prefixes     = [var.subnet_config.address_prefixes]
 }
 
+data "azurerm_key_vault" "key_vault" {
+  name                = var.key_vault_config.name
+  resource_group_name = var.key_vault_config.resource_group_name
+}
+
 module "virtual-machine" {
   source = "../"
 
@@ -36,6 +41,7 @@ module "virtual-machine" {
   virtual_machine_size    = "Standard_B2s"
   generate_admin_ssh_key  = true
   instances_count         = 1
+  key_vault_id            = data.azurerm_key_vault.key_vault.id
 
   # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
   # remove these argument from module if you dont want to use it.

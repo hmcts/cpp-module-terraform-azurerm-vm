@@ -759,3 +759,15 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "key_vault_id" {
+  type        = string
+  default     = ""
+  description = "Azure keyvault ID to write the secrets"
+}
+
+variable "dns_zone_name" {
+  type        = string
+  default     = ""
+  description = "Private DNS name to append to VM name"
+}
