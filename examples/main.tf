@@ -13,6 +13,11 @@ resource "azurerm_subnet" "vm" {
   address_prefixes     = [var.subnet_config.address_prefixes]
 }
 
+data "azurerm_key_vault" "key_vault" {
+  name                = var.key_vault_config.name
+  resource_group_name = var.key_vault_config.resource_group_name
+}
+
 module "virtual-machine" {
   source = "../"
 
@@ -22,6 +27,7 @@ module "virtual-machine" {
   virtual_network_name    = var.subnet_config.virtual_network_name
   virtual_network_rg_name = var.subnet_config.resource_group_name
   subnet_name             = azurerm_subnet.vm.name
+  subnet_id               = azurerm_subnet.vm.id
   virtual_machine_name    = "vm-linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
@@ -36,6 +42,8 @@ module "virtual-machine" {
   virtual_machine_size    = "Standard_B2s"
   generate_admin_ssh_key  = true
   instances_count         = 1
+  key_vault_id            = data.azurerm_key_vault.key_vault.id
+  dns_zone_name           = "test"
 
   # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
   # remove these argument from module if you dont want to use it.

@@ -19,7 +19,12 @@ variable "virtual_network_rg_name" {
 }
 
 variable "subnet_name" {
-  description = "The name of the subnet to use in VM scale set"
+  description = "The name of the subnet to use in VM "
+  default     = ""
+}
+
+variable "subnet_id" {
+  description = "The name of the subnet to use in VM "
   default     = ""
 }
 
@@ -758,4 +763,16 @@ variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
   default     = {}
+}
+
+variable "key_vault_id" {
+  type        = string
+  default     = ""
+  description = "Azure keyvault ID to write the secrets"
+}
+
+variable "dns_zone_name" {
+  type        = string
+  default     = ""
+  description = "Private DNS name to append to VM name"
 }
