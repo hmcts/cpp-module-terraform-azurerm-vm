@@ -183,7 +183,7 @@ resource "azurerm_availability_set" "aset" {
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                           = var.os_flavor == "linux" ? var.instances_count : 0
-  name                            = var.instances_count == 1 ? format("%s%s", substr(var.virtual_machine_name, 0, 64), ".${var.dns_zone_name}") : format("%s%s",substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64), ".${var.dns_zone_name}")
+  name                            = var.instances_count == 1 ? format("%s%s", substr(var.virtual_machine_name, 0, 64), ".${var.dns_zone_name}") : format("%s%s", substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64), ".${var.dns_zone_name}")
   resource_group_name             = var.resource_group_name
   location                        = var.location
   size                            = var.virtual_machine_size
