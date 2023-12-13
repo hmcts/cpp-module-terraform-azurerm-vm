@@ -42,6 +42,7 @@ module "virtual-machine" {
   generate_admin_ssh_key  = true
   instances_count         = 1
   key_vault_id            = data.azurerm_key_vault.key_vault.id
+  dns_zone_name           = "test"
 
   # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
   # remove these argument from module if you dont want to use it.
