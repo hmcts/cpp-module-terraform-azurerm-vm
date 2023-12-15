@@ -162,9 +162,9 @@ resource "azurerm_proximity_placement_group" "appgrp" {
 #-----------------------------------------------------
 resource "azurerm_availability_set" "aset" {
   count                        = var.enable_vm_availability_set ? 1 : 0
-  name                         = lower("avail-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}")
-  resource_group_name          = data.azurerm_resource_group.rg.name
-  location                     = data.azurerm_resource_group.rg.location
+  name                         = lower("avail-${var.virtual_machine_name}-${var.location}")
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
   platform_fault_domain_count  = var.platform_fault_domain_count
   platform_update_domain_count = var.platform_update_domain_count
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
