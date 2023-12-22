@@ -2,8 +2,9 @@ package test
 
 import (
 	"testing"
-    "github.com/stretchr/testify/assert"
+
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTerraformVM(t *testing.T) {
@@ -12,8 +13,8 @@ func TestTerraformVM(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
 		TerraformDir: "../../examples",
-		VarFiles: []string{"terratest.tfvars"},
-		Upgrade: true,
+		VarFiles:     []string{"terratest.tfvars"},
+		Upgrade:      true,
 	}
 
 	// Defer the destroy to cleanup all created resources
@@ -24,5 +25,5 @@ func TestTerraformVM(t *testing.T) {
 
 	// // Assert inputs with outputs
 	outputs_vm_name := terraform.Output(t, terraformOptions, "linux_virtual_machine_name")
-	assert.Equal(t, "vm-linux.test", outputs_vm_name)
+	assert.Equal(t, "VMLINUX01.test", outputs_vm_name)
 }

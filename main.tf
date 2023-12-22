@@ -92,7 +92,7 @@ resource "azurerm_key_vault_secret" "password" {
 #-----------------------------------
 resource "azurerm_public_ip" "pip" {
   count               = var.enable_public_ip_address == true ? var.instances_count : 0
-  name                = lower("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}")
+  name                = upper("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}")
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = var.public_ip_allocation_method
@@ -100,7 +100,7 @@ resource "azurerm_public_ip" "pip" {
   sku_tier            = var.public_ip_sku_tier
   domain_name_label   = var.domain_name_label
   zones               = var.public_ip_availability_zone
-  tags                = merge({ "ResourceName" = lower("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
+  tags                = merge({ "ResourceName" = upper("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
 
   lifecycle {
     ignore_changes = [
@@ -115,17 +115,17 @@ resource "azurerm_public_ip" "pip" {
 #---------------------------------------
 resource "azurerm_network_interface" "nic" {
   count                         = var.instances_count
-  name                          = var.instances_count == 1 ? lower("nic-${format("vm%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")))}") : lower("nic-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}")
+  name                          = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}")
   resource_group_name           = var.resource_group_name
   location                      = var.location
   dns_servers                   = var.dns_servers
   enable_ip_forwarding          = var.enable_ip_forwarding
   enable_accelerated_networking = var.enable_accelerated_networking
   internal_dns_name_label       = var.internal_dns_name_label
-  tags                          = merge({ "ResourceName" = var.instances_count == 1 ? lower("nic-${format("vm%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")))}") : lower("nic-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}") }, var.tags, )
+  tags                          = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
 
   ip_configuration {
-    name                          = lower("ipconig-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}")
+    name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}")
     primary                       = true
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = var.private_ip_address_allocation_type
@@ -145,10 +145,10 @@ resource "azurerm_network_interface" "nic" {
 #----------------------------------------------------------------------------------------------------
 resource "azurerm_proximity_placement_group" "appgrp" {
   count               = var.enable_proximity_placement_group ? 1 : 0
-  name                = lower("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}")
+  name                = upper("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}")
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
-  tags                = merge({ "ResourceName" = lower("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
+  tags                = merge({ "ResourceName" = upper("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
 
   lifecycle {
     ignore_changes = [
@@ -162,14 +162,14 @@ resource "azurerm_proximity_placement_group" "appgrp" {
 #-----------------------------------------------------
 resource "azurerm_availability_set" "aset" {
   count                        = var.enable_vm_availability_set ? 1 : 0
-  name                         = lower("avail-${var.virtual_machine_name}-${var.location}")
+  name                         = upper("AS-${var.virtual_machine_name}-${var.location}")
   resource_group_name          = var.resource_group_name
   location                     = var.location
   platform_fault_domain_count  = var.platform_fault_domain_count
   platform_update_domain_count = var.platform_update_domain_count
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   managed                      = true
-  tags                         = merge({ "ResourceName" = lower("avail-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
+  tags                         = merge({ "ResourceName" = upper("AS-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
 
   lifecycle {
     ignore_changes = [
@@ -183,7 +183,7 @@ resource "azurerm_availability_set" "aset" {
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                           = var.os_flavor == "linux" ? var.instances_count : 0
-  name                            = var.instances_count == 1 ? format("%s%s", substr(var.virtual_machine_name, 0, 64), ".${var.dns_zone_name}") : format("%s%s", substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64), ".${var.dns_zone_name}")
+  name                            = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
   resource_group_name             = var.resource_group_name
   location                        = var.location
   size                            = var.virtual_machine_size
@@ -200,7 +200,13 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   encryption_at_host_enabled      = var.enable_encryption_at_host
   proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   zone                            = var.vm_availability_zone
-  tags                            = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
+
+  tags = merge(
+    {
+      "ResourceName" = format("%s%02d", var.virtual_machine_name, count.index + 1)
+    },
+    var.tags
+  )
 
   dynamic "admin_ssh_key" {
     for_each = var.disable_password_authentication ? [1] : []
@@ -260,8 +266,8 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
   count                        = var.os_flavor == "windows" ? var.instances_count : 0
-  name                         = var.instances_count == 1 ? substr(var.virtual_machine_name, 0, 15) : substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
-  computer_name                = var.instances_count == 1 ? substr(var.virtual_machine_name, 0, 15) : substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
+  name                         = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
+  computer_name                = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
   resource_group_name          = data.azurerm_resource_group.rg.name
   location                     = data.azurerm_resource_group.rg.location
   size                         = var.virtual_machine_size
@@ -281,7 +287,13 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   patch_mode                   = var.patch_mode
   zone                         = var.vm_availability_zone
   timezone                     = var.vm_time_zone
-  tags                         = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
+
+  tags = merge(
+    {
+      "ResourceName" = format("%s%02d", var.virtual_machine_name, count.index + 1)
+    },
+    var.tags
+  )
 
   dynamic "source_image_reference" {
     for_each = var.source_image_id != null ? [] : [1]
@@ -430,7 +442,7 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "vmdiag" {
   count                      = var.log_analytics_workspace_id != null && var.storage_account_name != null ? var.instances_count : 0
-  name                       = lower("${var.virtual_machine_name}-diag")
+  name                       = upper("${var.virtual_machine_name}-diag")
   target_resource_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = var.log_analytics_workspace_id
