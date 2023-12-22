@@ -28,7 +28,7 @@ module "virtual-machine" {
   virtual_network_rg_name = var.subnet_config.resource_group_name
   subnet_name             = azurerm_subnet.vm.name
   subnet_id               = azurerm_subnet.vm.id
-  virtual_machine_name    = "vm-linux"
+  virtual_machine_name    = "vmlinux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Check the README.md file for more pre-defined images for Ubuntu, Centos, RedHat.
