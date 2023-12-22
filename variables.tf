@@ -1,26 +1,51 @@
 variable "resource_group_name" {
   description = "A container that holds related resources for an Azure solution"
   default     = ""
+
+  validation {
+    condition     = can(regex("^RG-", var.resource_group_name))
+    error_message = "Must start with RG-."
+  }
+}
+
+variable "storage_account_rg" {
+  description = "An RG that the storage account is in"
+  default     = ""
 }
 
 variable "location" {
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
-  default     = ""
+  default     = "uksouth"
 }
 
 variable "virtual_network_name" {
   description = "The name of the virtual network"
   default     = ""
+
+  validation {
+    condition     = can(regex("^VN-", var.virtual_network_name))
+    error_message = "Must start with VN-."
+  }
 }
 
 variable "virtual_network_rg_name" {
   description = "The name of the virtual network resource group"
   default     = ""
+
+  validation {
+    condition     = can(regex("^RG-", var.virtual_network_rg_name))
+    error_message = "Must start with RG-."
+  }
 }
 
 variable "subnet_name" {
   description = "The name of the subnet to use in VM "
   default     = ""
+
+  validation {
+    condition     = can(regex("^SN-", var.subnet_name))
+    error_message = "Must start with SN-."
+  }
 }
 
 variable "subnet_id" {
@@ -119,7 +144,13 @@ variable "existing_network_security_group_id" {
 
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
+  type        = string
   default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9]+$", var.virtual_machine_name))
+    error_message = "The virtual machine name can only contain alphanumeric characters."
+  }
 }
 
 variable "instances_count" {
