@@ -8,6 +8,11 @@ variable "resource_group_name" {
   }
 }
 
+variable "storage_account_rg" {
+  description = "An RG that the storage account is in"
+  default     = ""
+}
+
 variable "location" {
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
   default     = "uksouth"

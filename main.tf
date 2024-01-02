@@ -35,6 +35,11 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
+data "azurerm_resource_group" "sa_rg" {
+  count = var.storage_account_name != null ? 1 : 0
+  name  = var.storage_account_rg
+}
+
 data "azurerm_virtual_network" "vnet" {
   name                = var.virtual_network_name
   resource_group_name = var.virtual_network_rg_name
@@ -49,7 +54,7 @@ data "azurerm_subnet" "snet" {
 data "azurerm_storage_account" "storeacc" {
   count               = var.storage_account_name != null ? 1 : 0
   name                = var.storage_account_name
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = data.azurerm_resource_group.sa_rg[0].name
 }
 
 resource "random_password" "passwd" {
