@@ -446,8 +446,8 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # azurerm monitoring diagnostics
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "vmdiag" {
-  count                      = var.log_analytics_workspace_id != null && var.storage_account_name != null ? var.instances_count : 0
-  name                       = upper("${var.virtual_machine_name}-diag")
+  count                      = var.log_analytics_workspace_id != null || var.storage_account_name != null ? var.instances_count : 0
+  name                       = upper("DIAG-${var.virtual_machine_name}${format("%02d", count.index + 1)}")
   target_resource_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = var.log_analytics_workspace_id
