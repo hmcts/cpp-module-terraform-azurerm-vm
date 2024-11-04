@@ -124,8 +124,8 @@ resource "azurerm_network_interface" "nic" {
   resource_group_name           = var.resource_group_name
   location                      = var.location
   dns_servers                   = var.dns_servers
-  enable_ip_forwarding          = var.enable_ip_forwarding
-  enable_accelerated_networking = var.enable_accelerated_networking
+  ip_forwarding_enabled          = var.enable_ip_forwarding
+  accelerated_networking_enabled = var.enable_accelerated_networking
   internal_dns_name_label       = var.internal_dns_name_label
   tags                          = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
 
