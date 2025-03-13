@@ -2,7 +2,7 @@ locals {
   vm_details = flatten([
     for k, inst in azurerm_linux_virtual_machine.linux_vm : [
       {
-        vmname = replace(inst.name, ".${var.dns_zone_name}", "")
+        vmname = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
         vmid   = inst.id
       }
     ]
@@ -188,7 +188,7 @@ resource "azurerm_availability_set" "aset" {
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                           = var.os_flavor == "linux" ? var.instances_count : 0
-  name                            = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
+  name                            = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
   resource_group_name             = var.resource_group_name
   location                        = var.location
   size                            = var.virtual_machine_size
@@ -271,8 +271,8 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
   count                        = var.os_flavor == "windows" ? var.instances_count : 0
-  name                         = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
-  computer_name                = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
+  name                         = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
+  computer_name                = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
   resource_group_name          = data.azurerm_resource_group.rg.name
   location                     = data.azurerm_resource_group.rg.location
   size                         = var.virtual_machine_size

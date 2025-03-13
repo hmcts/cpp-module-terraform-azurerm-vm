@@ -807,3 +807,9 @@ variable "dns_zone_name" {
   default     = ""
   description = "Private DNS name to append to VM name"
 }
+
+variable "append_dns_name" {
+  type        = bool
+  default     = true
+  description = "Append DNS name to VM name"
+}
