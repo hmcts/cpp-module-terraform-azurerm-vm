@@ -813,3 +813,9 @@ variable "append_dns_name" {
   default     = true
   description = "Append DNS name to VM name"
 }
+
+variable "custom-os-disk-name" {
+  type        = list(string)
+  default     = []
+  description = "Custom OS disk name"
+}

@@ -237,7 +237,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     disk_encryption_set_id    = var.disk_encryption_set_id
     disk_size_gb              = var.disk_size_gb
     write_accelerator_enabled = var.enable_os_disk_write_accelerator
-    name                      = "${var.os_disk_name}-${count.index}"
+    name                      = length(var.custom-os-disk-name) > 0 ? var.custom-os-disk-name[count.index] : "${var.os_disk_name}-${count.index}"
   }
 
   additional_capabilities {
