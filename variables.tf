@@ -824,3 +824,14 @@ variable "deploy_entra_extension" {
   description = "Install Entra Extension linux VM"
   default     = false
 }
+
+variable "admin_user_group_id" {
+  description = "The ID of the group to assign the Virtual Machine Administrator Login role"
+  default     = null
+  type        = string
+}
+variable "standard_user_group_id" {
+  description = "The ID of the group to assign the Virtual Machine User Login role"
+  default     = null
+  type        = string
+}
