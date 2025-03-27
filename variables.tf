@@ -819,3 +819,8 @@ variable "custom-os-disk-name" {
   default     = []
   description = "Custom OS disk name"
 }
+
+variable "deploy_entra_extension" {
+  description = "Install Entra Extension linux VM"
+  default     = false
+}
