@@ -460,3 +460,16 @@ resource "azurerm_monitor_diagnostic_setting" "vmdiag" {
     }
   }
 }
+
+#--------------------------------------------------------------
+# AADSSHLoginForLinux for Linux extension
+#--------------------------------------------------------------
+resource "azurerm_virtual_machine_extension" "entra" {
+  count                      = var.deploy_entra_extension && var.os_flavor == "linux" ? var.instances_count : 0
+  name                       = var.instances_count == 1 ? "AADSSHLoginForLinux" : format("%s%s", "AADSSHLoginForLinux", count.index + 1)
+  virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
+  publisher                  = "Microsoft.Azure.ActiveDirectory"
+  type                       = "AADSSHLoginForLinux"
+  type_handler_version       = "1.0"
+  auto_upgrade_minor_version = true
+}

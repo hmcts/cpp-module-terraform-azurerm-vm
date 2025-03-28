@@ -819,3 +819,18 @@ variable "custom-os-disk-name" {
   default     = []
   description = "Custom OS disk name"
 }
+
+variable "deploy_entra_extension" {
+  description = "Install Entra Extension linux VM"
+  default     = false
+}
+
+variable "rbac_config" {
+  type = map(object({
+    scope                = string
+    role_definition_name = string
+    principal_id         = string
+  }))
+  description = "Map containing the RBAC configuration for the VM"
+  default     = {}
+}
