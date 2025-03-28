@@ -1,13 +1,6 @@
 resource "azurerm_role_assignment" "admin-user" {
-  count                = var.deploy_entra_extension && var.os_flavor == "linux" && var.admin_user_group_id != null ? 1 : 0
-  scope                = data.azurerm_resource_group.rg.id
-  role_definition_name = "Virtual Machine Administrator Login"
-  principal_id         = var.admin_user_group_id
-}
-
-resource "azurerm_role_assignment" "standard-user" {
-  count                = var.deploy_entra_extension && var.os_flavor == "linux" && var.standard_user_group_id != null ? 1 : 0
-  scope                = data.azurerm_resource_group.rg.id
-  role_definition_name = "Virtual Machine User Login"
-  principal_id         = var.standard_user_group_id
+  for_each             = var.deploy_entra_extension && var.os_flavor == "linux" ? { for key, value in var.rbac_config : key => value } : {}
+  scope                = each.value.scope
+  role_definition_name = each.value.role_definition_name
+  principal_id         = each.value.principal_id
 }

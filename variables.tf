@@ -825,13 +825,12 @@ variable "deploy_entra_extension" {
   default     = false
 }
 
-variable "admin_user_group_id" {
-  description = "The ID of the group to assign the Virtual Machine Administrator Login role"
-  default     = null
-  type        = string
-}
-variable "standard_user_group_id" {
-  description = "The ID of the group to assign the Virtual Machine User Login role"
-  default     = null
-  type        = string
+variable "rbac_config" {
+  type = map(object({
+    scope                = string
+    role_definition_name = string
+    principal_id         = string
+  }))
+  description = "Map containing the RBAC configuration for the VM"
+  default     = {}
 }
