@@ -107,12 +107,12 @@ resource "azurerm_public_ip" "pip" {
   zones               = var.public_ip_availability_zone
   tags                = merge({ "ResourceName" = upper("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-      ip_tags,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #     ip_tags,
+  #   ]
+  # }
 }
 
 #---------------------------------------
@@ -138,11 +138,11 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = var.enable_public_ip_address == true ? element(concat(azurerm_public_ip.pip.*.id, [""]), count.index) : null
   }
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #   ]
+  # }
 }
 
 #----------------------------------------------------------------------------------------------------
@@ -155,11 +155,11 @@ resource "azurerm_proximity_placement_group" "appgrp" {
   location            = data.azurerm_resource_group.rg.location
   tags                = merge({ "ResourceName" = upper("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #   ]
+  # }
 }
 
 #-----------------------------------------------------
@@ -176,11 +176,11 @@ resource "azurerm_availability_set" "aset" {
   managed                      = true
   tags                         = merge({ "ResourceName" = upper("AS-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #   ]
+  # }
 }
 
 #---------------------------------------
@@ -259,11 +259,11 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #   ]
+  # }
 }
 
 #---------------------------------------
@@ -354,12 +354,12 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-      patch_mode,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #     patch_mode,
+  #   ]
+  # }
 }
 
 #---------------------------------------
@@ -375,11 +375,11 @@ resource "azurerm_managed_disk" "data_disk" {
   disk_size_gb         = each.value.data_disk.disk_size_gb
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     tags,
+  #   ]
+  # }
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
