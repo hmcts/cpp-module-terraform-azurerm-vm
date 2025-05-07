@@ -231,7 +231,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     }
   }
   dynamic "plan" {
-    for_each = var.require_plan != null ? [] : [1]
+    for_each = var.require_plan ? [1] : []
     content {
       name      = var.custom_image != null ? var.custom_image["sku"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["sku"]
       product   = var.custom_image != null ? var.custom_image["offer"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["offer"]
