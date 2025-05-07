@@ -838,5 +838,5 @@ variable "rbac_config" {
 variable "require_plan" {
   type        = bool
   default     = false
-  description = "requires plan for market place images"
+  description = "requires plan for market place images or not"
 }
