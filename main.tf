@@ -230,6 +230,14 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
       version   = var.custom_image != null ? var.custom_image["version"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["version"]
     }
   }
+  dynamic "plan" {
+    for_each = var.require_plan != null ? [] : [1]
+    content {
+      name      = var.custom_image != null ? var.custom_image["sku"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["sku"]
+      product   = var.custom_image != null ? var.custom_image["offer"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["offer"]
+      publisher = var.custom_image != null ? var.custom_image["publisher"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["publisher"]
+    }
+  }
 
   os_disk {
     storage_account_type      = var.os_disk_storage_account_type
