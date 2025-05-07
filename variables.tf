@@ -834,3 +834,9 @@ variable "rbac_config" {
   description = "Map containing the RBAC configuration for the VM"
   default     = {}
 }
+
+variable "require_plan" {
+  type        = bool
+  default     = false
+  description = "requires plan for market place images"
+}

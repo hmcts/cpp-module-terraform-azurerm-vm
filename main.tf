@@ -204,7 +204,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id             = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   encryption_at_host_enabled      = var.enable_encryption_at_host
   proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  zone                            = var.vm_availability_zone
+  zone                            = split(",", "1,2,3")[count.index]
 
   tags = merge(
     {
@@ -231,7 +231,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     }
   }
   dynamic "plan" {
-    for_each = var.source_image_id != null ? [] : [1]
+    for_each = var.require_plan != null ? [] : [1]
     content {
       name      = var.custom_image != null ? var.custom_image["sku"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["sku"]
       product   = var.custom_image != null ? var.custom_image["offer"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["offer"]
