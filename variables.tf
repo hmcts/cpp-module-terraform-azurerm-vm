@@ -840,3 +840,9 @@ variable "require_plan" {
   default     = false
   description = "requires plan for market place images or not"
 }
+
+variable "zones_list" {
+  type        = list(string)
+  default     = []
+  description = "List of availability zones"
+}
