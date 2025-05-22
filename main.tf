@@ -204,7 +204,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id             = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   encryption_at_host_enabled      = var.enable_encryption_at_host
   proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  zone                            = var.vm_availability_zone
+  zone                            = var.vm_availability_zone == null ? var.zones_list[count.index] : var.vm_availability_zone
 
   tags = merge(
     {
