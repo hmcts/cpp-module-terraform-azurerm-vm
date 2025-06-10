@@ -60,3 +60,17 @@ output "vm_availability_set_id" {
   description = "The resource ID of Virtual Machine availability set"
   value       = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
 }
+
+output "linux_vm_system_assigned_identity_principal_ids" {
+  description = "System assigned identity principal IDs for Linux VMs"
+  value = var.os_flavor == "linux" && contains(["SystemAssigned", "SystemAssigned, UserAssigned"], var.managed_identity_type) ? [
+    for vm in azurerm_linux_virtual_machine.linux_vm : try(vm.identity[0].principal_id, null)
+  ] : null
+}
+
+output "windows_vm_system_assigned_identity_principal_ids" {
+  description = "System assigned identity principal IDs for Windows VMs"
+  value = var.os_flavor == "windows" && contains(["SystemAssigned", "SystemAssigned, UserAssigned"], var.managed_identity_type) ? [
+    for vm in azurerm_windows_virtual_machine.win_vm : try(vm.identity[0].principal_id, null)
+  ] : null
+}
