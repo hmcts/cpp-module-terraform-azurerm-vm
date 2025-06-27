@@ -138,6 +138,17 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = var.enable_public_ip_address == true ? element(concat(azurerm_public_ip.pip.*.id, [""]), count.index) : null
   }
 
+  dynamic "ip_configuration" {
+    for_each = var.additional_ip_configs
+    content {
+      name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}-${ip_configuration.key}")
+      primary                       = false
+      subnet_id                     = ip_configuration.value.subnet_id != null ? ip_configuration.value.subnet_id : var.subnet_id
+      private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
+      private_ip_address            = ip_configuration.value.private_ip_address_allocation == "Static" ? ip_configuration.value.private_ip_address : null
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       tags,
