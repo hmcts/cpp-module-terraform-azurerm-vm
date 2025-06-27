@@ -846,3 +846,13 @@ variable "zones_list" {
   default     = []
   description = "List of availability zones"
 }
+
+variable "additional_ip_configs" {
+  description = "Additional IP configurations for the network interface"
+  type = map(object({
+    private_ip_address_allocation = optional(string, "Dynamic")
+    private_ip_address            = optional(string)
+    subnet_id                     = optional(string)
+  }))
+  default = {}
+}
