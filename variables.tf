@@ -850,7 +850,6 @@ variable "zones_list" {
 variable "additional_ip_configs" {
   description = "Additional IP configurations for the network interface"
   type = map(object({
-    name                          = string
     private_ip_address_allocation = optional(string, "Dynamic")
     private_ip_address            = optional(string)
     subnet_id                     = optional(string)
