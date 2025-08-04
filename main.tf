@@ -2,7 +2,7 @@ locals {
   vm_details = flatten([
     for k, inst in azurerm_linux_virtual_machine.linux_vm : [
       {
-        vmname = replace(inst.name, ".${var.dns_zone_name}", "")
+        vmname = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
         vmid   = inst.id
       }
     ]
@@ -138,6 +138,17 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = var.enable_public_ip_address == true ? element(concat(azurerm_public_ip.pip.*.id, [""]), count.index) : null
   }
 
+  dynamic "ip_configuration" {
+    for_each = var.additional_ip_configs
+    content {
+      name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}-${ip_configuration.key}")
+      primary                       = false
+      subnet_id                     = ip_configuration.value.subnet_id != null ? ip_configuration.value.subnet_id : var.subnet_id
+      private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
+      private_ip_address            = ip_configuration.value.private_ip_address_allocation == "Static" ? ip_configuration.value.private_ip_address : null
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       tags,
@@ -188,7 +199,7 @@ resource "azurerm_availability_set" "aset" {
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                           = var.os_flavor == "linux" ? var.instances_count : 0
-  name                            = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
+  name                            = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
   resource_group_name             = var.resource_group_name
   location                        = var.location
   size                            = var.virtual_machine_size
@@ -204,7 +215,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id             = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   encryption_at_host_enabled      = var.enable_encryption_at_host
   proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  zone                            = var.vm_availability_zone
+  zone                            = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
 
   tags = merge(
     {
@@ -230,6 +241,14 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
       version   = var.custom_image != null ? var.custom_image["version"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["version"]
     }
   }
+  dynamic "plan" {
+    for_each = var.require_plan ? [1] : []
+    content {
+      name      = var.custom_image != null ? var.custom_image["sku"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["sku"]
+      product   = var.custom_image != null ? var.custom_image["offer"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["offer"]
+      publisher = var.custom_image != null ? var.custom_image["publisher"] : var.linux_distribution_list[lower(var.linux_distribution_name)]["publisher"]
+    }
+  }
 
   os_disk {
     storage_account_type      = var.os_disk_storage_account_type
@@ -237,7 +256,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     disk_encryption_set_id    = var.disk_encryption_set_id
     disk_size_gb              = var.disk_size_gb
     write_accelerator_enabled = var.enable_os_disk_write_accelerator
-    name                      = "${var.os_disk_name}-${count.index}"
+    name                      = length(var.custom-os-disk-name) > 0 ? var.custom-os-disk-name[count.index] : "${var.os_disk_name}-${count.index}"
   }
 
   additional_capabilities {
@@ -271,8 +290,8 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
   count                        = var.os_flavor == "windows" ? var.instances_count : 0
-  name                         = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
-  computer_name                = format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name)
+  name                         = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
+  computer_name                = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
   resource_group_name          = data.azurerm_resource_group.rg.name
   location                     = data.azurerm_resource_group.rg.location
   size                         = var.virtual_machine_size
@@ -290,7 +309,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   encryption_at_host_enabled   = var.enable_encryption_at_host
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   patch_mode                   = var.patch_mode
-  zone                         = var.vm_availability_zone
+  zone                         = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
   timezone                     = var.vm_time_zone
 
   tags = merge(
@@ -459,4 +478,17 @@ resource "azurerm_monitor_diagnostic_setting" "vmdiag" {
       enabled = false
     }
   }
+}
+
+#--------------------------------------------------------------
+# AADSSHLoginForLinux for Linux extension
+#--------------------------------------------------------------
+resource "azurerm_virtual_machine_extension" "entra" {
+  count                      = var.deploy_entra_extension && var.os_flavor == "linux" ? var.instances_count : 0
+  name                       = var.instances_count == 1 ? "AADSSHLoginForLinux" : format("%s%s", "AADSSHLoginForLinux", count.index + 1)
+  virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
+  publisher                  = "Microsoft.Azure.ActiveDirectory"
+  type                       = "AADSSHLoginForLinux"
+  type_handler_version       = "1.0"
+  auto_upgrade_minor_version = true
 }

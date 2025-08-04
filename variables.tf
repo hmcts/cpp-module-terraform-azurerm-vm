@@ -240,12 +240,12 @@ variable "admin_ssh_key_data" {
 
 variable "custom_image" {
   description = "Provide the custom image to this module if the default variants are not sufficient"
-  type = map(object({
+  type = object({
     publisher = string
     offer     = string
     sku       = string
     version   = string
-  }))
+  })
   default = null
 }
 
@@ -806,4 +806,53 @@ variable "dns_zone_name" {
   type        = string
   default     = ""
   description = "Private DNS name to append to VM name"
+}
+
+variable "append_dns_name" {
+  type        = bool
+  default     = true
+  description = "Append DNS name to VM name"
+}
+
+variable "custom-os-disk-name" {
+  type        = list(string)
+  default     = []
+  description = "Custom OS disk name"
+}
+
+variable "deploy_entra_extension" {
+  description = "Install Entra Extension linux VM"
+  default     = false
+}
+
+variable "rbac_config" {
+  type = map(object({
+    scope                = string
+    role_definition_name = string
+    principal_id         = string
+  }))
+  description = "Map containing the RBAC configuration for the VM"
+  default     = {}
+}
+
+variable "require_plan" {
+  type        = bool
+  default     = false
+  description = "requires plan for market place images or not"
+}
+
+variable "zones_list" {
+  type        = list(string)
+  default     = []
+  description = "List of availability zones"
+}
+
+variable "additional_ip_configs" {
+  description = "Additional IP configurations for the network interface"
+  type = map(object({
+    private_ip_address_allocation = optional(string, "Dynamic")
+    private_ip_address            = optional(string)
+    subnet_id                     = optional(string)
+  }))
+  default = {}
 }
