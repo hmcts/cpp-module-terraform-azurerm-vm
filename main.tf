@@ -4,6 +4,7 @@ locals {
       {
         vmname = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
         vmid   = inst.id
+        vmzone = inst.zone != null ? inst.zone : null
       }
     ]
   ])
@@ -14,6 +15,7 @@ locals {
         vmid      = vm.vmid
         idx       = idx
         data_disk = disk
+        vmzone    = vm.vmzone
       }
     ]
   ])
@@ -80,7 +82,7 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
 
 resource "azurerm_key_vault_secret" "ssh_private_key" {
   count        = var.generate_admin_ssh_key == true ? 1 : 0
-  name         = "${var.virtual_machine_name}--vmss-ssh-private-key"
+  name         = "${var.virtual_machine_name}-vmss-ssh-private-key"
   value        = tls_private_key.rsa[0].private_key_pem
   key_vault_id = var.key_vault_id
 }
@@ -119,15 +121,15 @@ resource "azurerm_public_ip" "pip" {
 # Network Interface for Virtual Machine
 #---------------------------------------
 resource "azurerm_network_interface" "nic" {
-  count                         = var.instances_count
-  name                          = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}")
-  resource_group_name           = var.resource_group_name
-  location                      = var.location
-  dns_servers                   = var.dns_servers
-  enable_ip_forwarding          = var.enable_ip_forwarding
-  enable_accelerated_networking = var.enable_accelerated_networking
-  internal_dns_name_label       = var.internal_dns_name_label
-  tags                          = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
+  count                          = var.instances_count
+  name                           = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}")
+  resource_group_name            = var.resource_group_name
+  location                       = var.location
+  dns_servers                    = var.dns_servers
+  ip_forwarding_enabled          = var.enable_ip_forwarding
+  accelerated_networking_enabled = var.enable_accelerated_networking
+  internal_dns_name_label        = var.internal_dns_name_label
+  tags                           = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
 
   ip_configuration {
     name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}")
@@ -393,6 +395,7 @@ resource "azurerm_managed_disk" "data_disk" {
   create_option        = "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
+  zone                 = each.value.vmzone != null ? each.value.vmzone : null
 
   lifecycle {
     ignore_changes = [
@@ -492,3 +495,4 @@ resource "azurerm_virtual_machine_extension" "entra" {
   type_handler_version       = "1.0"
   auto_upgrade_minor_version = true
 }
+
