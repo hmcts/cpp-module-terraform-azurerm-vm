@@ -82,7 +82,7 @@ resource "azurerm_key_vault_secret" "ssh_public_key" {
 
 resource "azurerm_key_vault_secret" "ssh_private_key" {
   count        = var.generate_admin_ssh_key == true ? 1 : 0
-  name         = "${var.virtual_machine_name}--vmss-ssh-private-key"
+  name         = "${var.virtual_machine_name}-vmss-ssh-private-key"
   value        = tls_private_key.rsa[0].private_key_pem
   key_vault_id = var.key_vault_id
 }
@@ -495,3 +495,4 @@ resource "azurerm_virtual_machine_extension" "entra" {
   type_handler_version       = "1.0"
   auto_upgrade_minor_version = true
 }
+
