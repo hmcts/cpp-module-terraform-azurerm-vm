@@ -120,7 +120,7 @@ resource "azurerm_public_ip" "pip" {
 #---------------------------------------
 resource "azurerm_network_interface" "nic" {
   count                         = var.instances_count
-  name                          = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}")
+  name                          = upper("nic-vm${var.virtual_machine_name}${format("%03d", count.index + 1)}")
   resource_group_name           = var.resource_group_name
   location                      = var.location
   dns_servers                   = var.dns_servers
@@ -130,7 +130,7 @@ resource "azurerm_network_interface" "nic" {
   tags                          = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
 
   ip_configuration {
-    name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}")
+    name                          = upper("ipconfig-${var.virtual_machine_name}${format("%03d", count.index + 1)}")
     primary                       = true
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = var.private_ip_address_allocation_type
@@ -141,7 +141,7 @@ resource "azurerm_network_interface" "nic" {
   dynamic "ip_configuration" {
     for_each = var.additional_ip_configs
     content {
-      name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}-${ip_configuration.key}")
+      name                          = upper("ipconfig-${var.virtual_machine_name}${format("%03d", count.index + 1)}-${ip_configuration.key}")
       primary                       = false
       subnet_id                     = ip_configuration.value.subnet_id != null ? ip_configuration.value.subnet_id : var.subnet_id
       private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
