@@ -491,5 +491,5 @@ resource "azurerm_virtual_machine_extension" "entra" {
   type                       = "AADSSHLoginForLinux"
   type_handler_version       = "1.0"
   auto_upgrade_minor_version = true
-  depends_on = [ azurerm_virtual_machine_data_disk_attachment.data_disk ]
+  depends_on                 = [ azurerm_virtual_machine_data_disk_attachment.data_disk ]
 }
