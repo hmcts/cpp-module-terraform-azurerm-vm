@@ -109,7 +109,6 @@ resource "azurerm_public_ip" "pip" {
 
   lifecycle {
     ignore_changes = [
-      tags,
       ip_tags,
     ]
   }
@@ -148,12 +147,6 @@ resource "azurerm_network_interface" "nic" {
       private_ip_address            = ip_configuration.value.private_ip_address_allocation == "Static" ? ip_configuration.value.private_ip_address : null
     }
   }
-
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
 }
 
 #----------------------------------------------------------------------------------------------------
@@ -165,12 +158,6 @@ resource "azurerm_proximity_placement_group" "appgrp" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   tags                = merge({ "ResourceName" = upper("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
-
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
 }
 
 #-----------------------------------------------------
@@ -186,12 +173,6 @@ resource "azurerm_availability_set" "aset" {
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   managed                      = true
   tags                         = merge({ "ResourceName" = upper("AS-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
-
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
 }
 
 #---------------------------------------
@@ -276,12 +257,6 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     content {
       storage_account_uri = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.primary_blob_endpoint : var.storage_account_uri
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
   }
 }
 
@@ -375,7 +350,6 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 
   lifecycle {
     ignore_changes = [
-      tags,
       patch_mode,
     ]
   }
@@ -393,12 +367,6 @@ resource "azurerm_managed_disk" "data_disk" {
   create_option        = "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
-
-  lifecycle {
-    ignore_changes = [
-      tags,
-    ]
-  }
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
