@@ -48,7 +48,7 @@ output "linux_virtual_machine_ids" {
 
 output "linux_virtual_machine_names" {
   description = "The resource id's of all Linux Virtual Machine."
-  value       = var.os_flavor == "linux" ? concat(azurerm_linux_virtual_machine.linux_vm.*.name, [""]) : null
+  value       = var.os_flavor == "linux" ? azurerm_linux_virtual_machine.linux_vm[*].name : []
 }
 
 output "windows_virtual_machine_ids" {
