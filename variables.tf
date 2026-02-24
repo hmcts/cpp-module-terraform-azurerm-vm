@@ -198,6 +198,11 @@ variable "custom_data" {
   default     = null
 }
 
+variable "patch_assessment_mode" {
+  description = "Specifies Patch Assessment Mode - default is ImageDefault"
+  default     = "ImageDefault"
+}
+
 variable "enable_automatic_updates" {
   description = "Specifies if Automatic Updates are Enabled for the Windows Virtual Machine."
   default     = false
