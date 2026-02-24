@@ -198,6 +198,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   zone                            = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
   patch_assessment_mode           = var.patch_assessment_mode
+  patch_mode                      = var.patch_mode
 
   tags = merge(
     {
@@ -286,6 +287,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   patch_mode                   = var.patch_mode
   zone                         = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
+  patch_assessment_mode        = var.patch_assessment_mode
   timezone                     = var.vm_time_zone
 
   tags = merge(
