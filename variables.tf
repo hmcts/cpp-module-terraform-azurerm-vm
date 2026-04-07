@@ -215,7 +215,12 @@ variable "vm_availability_zone" {
 
 variable "patch_mode" {
   description = "Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are `Manual`, `AutomaticByOS` and `AutomaticByPlatform`"
-  default     = "AutomaticByOS"
+  default     = "AutomaticByPlatform"
+}
+
+variable "patch_assessment_mode" {
+  description = "Specifies the mode of VM Guest Patching for the virtual machine. Possible values are `ImageDefault` or `AutomaticByPlatform`."
+  default     = "AutomaticByPlatform"
 }
 
 variable "license_type" {
