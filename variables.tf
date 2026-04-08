@@ -223,6 +223,11 @@ variable "patch_assessment_mode" {
   default     = "AutomaticByPlatform"
 }
 
+variable "bypass_platform_safety_checks_on_user_schedule_enabled" {
+  description = "Specifies whether to bypass platform safety checks when the user schedules maintenance. Only valid when `patch_mode` is set to `AutomaticByPlatform`."
+  default     = true
+}
+
 variable "license_type" {
   description = "Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are None, Windows_Client and Windows_Server."
   default     = "None"
