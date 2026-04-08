@@ -196,9 +196,10 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id             = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   encryption_at_host_enabled      = var.enable_encryption_at_host
   proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  patch_mode                      = var.patch_mode
-  patch_assessment_mode           = var.patch_assessment_mode
-  zone                            = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
+  patch_mode                                              = var.patch_mode
+  patch_assessment_mode                                   = var.patch_assessment_mode
+  bypass_platform_safety_checks_on_user_schedule_enabled = var.bypass_platform_safety_checks_on_user_schedule_enabled
+  zone                                                    = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
 
   tags = merge(
     {
@@ -285,10 +286,11 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   availability_set_id          = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   encryption_at_host_enabled   = var.enable_encryption_at_host
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  patch_mode                   = var.patch_mode
-  patch_assessment_mode        = var.patch_assessment_mode
-  zone                         = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
-  timezone                     = var.vm_time_zone
+  patch_mode                                              = var.patch_mode
+  patch_assessment_mode                                   = var.patch_assessment_mode
+  bypass_platform_safety_checks_on_user_schedule_enabled = var.bypass_platform_safety_checks_on_user_schedule_enabled
+  zone                                                    = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
+  timezone                                                = var.vm_time_zone
 
   tags = merge(
     {
