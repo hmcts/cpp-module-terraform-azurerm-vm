@@ -240,7 +240,7 @@ variable "vm_time_zone" {
 
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
-  default     = false
+  default     = true
 }
 
 variable "admin_ssh_key_data" {
