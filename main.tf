@@ -469,7 +469,7 @@ resource "azurerm_virtual_machine_extension" "entra" {
 }
 
 resource "null_resource" "update_hostname" {
-  for_each = var.dns_zone_name != "" ? {
+  for_each = var.update_hostname && var.dns_zone_name != "" ? {
     for idx, vm in azurerm_linux_virtual_machine.linux_vm : idx => vm
   } : {}
 
