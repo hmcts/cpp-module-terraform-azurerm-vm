@@ -766,7 +766,7 @@ variable "data_disks" {
     name                 = string
     storage_account_type = string
     disk_size_gb         = number
-    custom_name          = optional(string, "")
+    custom_name          = optional(list(string), [])
   }))
   default = []
 }
