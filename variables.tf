@@ -825,8 +825,8 @@ variable "append_dns_name" {
 }
 
 variable "custom-os-disk-name" {
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
   description = "Custom OS disk name"
 }
 
