@@ -2,8 +2,9 @@ locals {
   vm_details = flatten([
     for k, inst in azurerm_linux_virtual_machine.linux_vm : [
       {
-        vmname = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
-        vmid   = inst.id
+        vmname   = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
+        vmid     = inst.id
+        vm_index = k
       }
     ]
   ])
@@ -12,6 +13,7 @@ locals {
       for idx, disk in var.data_disks : {
         vmname    = vm.vmname
         vmid      = vm.vmid
+        vm_index  = vm.vm_index
         idx       = idx
         data_disk = disk
       }
@@ -366,12 +368,13 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
   for_each             = { for obj in local.vm_data_disks : "${obj.vmname}_${obj.idx}" => obj }
-  name                 = "${each.value.vmname}_DataDisk_${each.value.idx}"
+  name                 = length(each.value.data_disk.custom_name) > 0 ? each.value.data_disk.custom_name[each.value.vm_index] : "${each.value.vmname}_DataDisk_${each.value.idx}"
   resource_group_name  = var.resource_group_name
   location             = var.location
   storage_account_type = lookup(each.value.data_disk, "storage_account_type", "StandardSSD_LRS")
-  create_option        = "Empty"
+  create_option        = length(each.value.data_disk.create_option) > 0 ? each.value.data_disk.create_option[each.value.vm_index] : "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
+  source_resource_id   = length(each.value.data_disk.source_resource_id) > 0 ? each.value.data_disk.source_resource_id[each.value.vm_index] : null
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
 }
 
