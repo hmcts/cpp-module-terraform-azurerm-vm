@@ -2,8 +2,9 @@ locals {
   vm_details = flatten([
     for k, inst in azurerm_linux_virtual_machine.linux_vm : [
       {
-        vmname = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
-        vmid   = inst.id
+        vmname   = var.dns_zone_name != "" ? replace(inst.name, ".${var.dns_zone_name}", "") : inst.name
+        vmid     = inst.id
+        vm_index = k
       }
     ]
   ])
@@ -12,6 +13,7 @@ locals {
       for idx, disk in var.data_disks : {
         vmname    = vm.vmname
         vmid      = vm.vmid
+        vm_index  = vm.vm_index
         idx       = idx
         data_disk = disk
       }
@@ -179,27 +181,27 @@ resource "azurerm_availability_set" "aset" {
 # Linux Virutal machine
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
-  count                           = var.os_flavor == "linux" ? var.instances_count : 0
-  name                            = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
-  resource_group_name             = var.resource_group_name
-  location                        = var.location
-  size                            = var.virtual_machine_size
-  admin_username                  = var.admin_username
-  admin_password                  = var.disable_password_authentication == false && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
-  disable_password_authentication = var.disable_password_authentication
-  network_interface_ids           = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
-  source_image_id                 = var.source_image_id != null ? var.source_image_id : null
-  provision_vm_agent              = true
-  allow_extension_operations      = true
-  dedicated_host_id               = var.dedicated_host_id
-  custom_data                     = var.custom_data != null ? var.custom_data : null
-  availability_set_id             = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
-  encryption_at_host_enabled      = var.enable_encryption_at_host
-  proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  patch_mode                                              = var.patch_mode
-  patch_assessment_mode                                   = var.patch_assessment_mode
+  count                                                  = var.os_flavor == "linux" ? var.instances_count : 0
+  name                                                   = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
+  resource_group_name                                    = var.resource_group_name
+  location                                               = var.location
+  size                                                   = var.virtual_machine_size
+  admin_username                                         = var.admin_username
+  admin_password                                         = var.disable_password_authentication == false && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
+  disable_password_authentication                        = var.disable_password_authentication
+  network_interface_ids                                  = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
+  source_image_id                                        = var.source_image_id != null ? var.source_image_id : null
+  provision_vm_agent                                     = true
+  allow_extension_operations                             = true
+  dedicated_host_id                                      = var.dedicated_host_id
+  custom_data                                            = var.custom_data != null ? var.custom_data : null
+  availability_set_id                                    = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  encryption_at_host_enabled                             = var.enable_encryption_at_host
+  proximity_placement_group_id                           = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
+  patch_mode                                             = var.patch_mode
+  patch_assessment_mode                                  = var.patch_assessment_mode
   bypass_platform_safety_checks_on_user_schedule_enabled = var.bypass_platform_safety_checks_on_user_schedule_enabled
-  zone                                                    = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
+  zone                                                   = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
 
   tags = merge(
     {
@@ -267,30 +269,30 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 # Windows Virutal machine
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
-  count                        = var.os_flavor == "windows" ? var.instances_count : 0
-  name                         = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
-  computer_name                = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
-  resource_group_name          = data.azurerm_resource_group.rg.name
-  location                     = data.azurerm_resource_group.rg.location
-  size                         = var.virtual_machine_size
-  admin_username               = var.admin_username
-  admin_password               = var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
-  network_interface_ids        = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
-  source_image_id              = var.source_image_id != null ? var.source_image_id : null
-  provision_vm_agent           = true
-  allow_extension_operations   = true
-  dedicated_host_id            = var.dedicated_host_id
-  custom_data                  = var.custom_data != null ? var.custom_data : null
-  enable_automatic_updates     = var.enable_automatic_updates
-  license_type                 = var.license_type
-  availability_set_id          = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
-  encryption_at_host_enabled   = var.enable_encryption_at_host
-  proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  patch_mode                                              = var.patch_mode
-  patch_assessment_mode                                   = var.patch_assessment_mode
+  count                                                  = var.os_flavor == "windows" ? var.instances_count : 0
+  name                                                   = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
+  computer_name                                          = var.append_dns_name ? format("%s%02d.%s", upper(var.virtual_machine_name), count.index + 1, var.dns_zone_name) : format("%s%02d", upper(var.virtual_machine_name), count.index + 1)
+  resource_group_name                                    = data.azurerm_resource_group.rg.name
+  location                                               = data.azurerm_resource_group.rg.location
+  size                                                   = var.virtual_machine_size
+  admin_username                                         = var.admin_username
+  admin_password                                         = var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
+  network_interface_ids                                  = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
+  source_image_id                                        = var.source_image_id != null ? var.source_image_id : null
+  provision_vm_agent                                     = true
+  allow_extension_operations                             = true
+  dedicated_host_id                                      = var.dedicated_host_id
+  custom_data                                            = var.custom_data != null ? var.custom_data : null
+  enable_automatic_updates                               = var.enable_automatic_updates
+  license_type                                           = var.license_type
+  availability_set_id                                    = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  encryption_at_host_enabled                             = var.enable_encryption_at_host
+  proximity_placement_group_id                           = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
+  patch_mode                                             = var.patch_mode
+  patch_assessment_mode                                  = var.patch_assessment_mode
   bypass_platform_safety_checks_on_user_schedule_enabled = var.bypass_platform_safety_checks_on_user_schedule_enabled
-  zone                                                    = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
-  timezone                                                = var.vm_time_zone
+  zone                                                   = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
+  timezone                                               = var.vm_time_zone
 
   tags = merge(
     {
@@ -366,12 +368,13 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
   for_each             = { for obj in local.vm_data_disks : "${obj.vmname}_${obj.idx}" => obj }
-  name                 = "${each.value.vmname}_DataDisk_${each.value.idx}"
+  name                 = length(each.value.data_disk.custom_name) > 0 ? each.value.data_disk.custom_name[each.value.vm_index] : "${each.value.vmname}_DataDisk_${each.value.idx}"
   resource_group_name  = var.resource_group_name
   location             = var.location
   storage_account_type = lookup(each.value.data_disk, "storage_account_type", "StandardSSD_LRS")
-  create_option        = "Empty"
+  create_option        = length(each.value.data_disk.create_option) > 0 ? each.value.data_disk.create_option[each.value.vm_index] : "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
+  source_resource_id   = length(each.value.data_disk.source_resource_id) > 0 ? each.value.data_disk.source_resource_id[each.value.vm_index] : null
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
 }
 
