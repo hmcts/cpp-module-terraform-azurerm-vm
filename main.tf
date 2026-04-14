@@ -372,8 +372,9 @@ resource "azurerm_managed_disk" "data_disk" {
   resource_group_name  = var.resource_group_name
   location             = var.location
   storage_account_type = lookup(each.value.data_disk, "storage_account_type", "StandardSSD_LRS")
-  create_option        = "Empty"
+  create_option        = length(each.value.data_disk.create_option) > 0 ? each.value.data_disk.create_option[each.value.vm_index] : "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
+  source_resource_id   = length(each.value.data_disk.source_resource_id) > 0 ? each.value.data_disk.source_resource_id[each.value.vm_index] : null
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
 }
 
