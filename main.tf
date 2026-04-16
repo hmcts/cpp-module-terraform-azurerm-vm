@@ -471,14 +471,14 @@ resource "azurerm_virtual_machine_extension" "entra" {
   depends_on                 = [azurerm_virtual_machine_data_disk_attachment.data_disk]
 }
 
-resource "null_resource" "update_hostname" {
+resource "null_resource" "update_hostname_vm" {
   for_each = var.update_hostname && var.dns_zone_name != "" ? {
     for idx, vm in azurerm_linux_virtual_machine.linux_vm : idx => vm
   } : {}
 
   provisioner "remote-exec" {
     inline = [
-      "echo 'Adam'",
+      "grep -q '\\.${var.dns_zone_name}$$' /etc/hostname || sudo sed -i 's/$/.${var.dns_zone_name}/' /etc/hostname && sudo systemctl restart systemd-hostnamed",
     ]
     connection {
       type        = "ssh"
