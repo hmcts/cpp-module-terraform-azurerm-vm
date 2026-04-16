@@ -476,6 +476,11 @@ resource "null_resource" "update_hostname_vm" {
     for idx, vm in azurerm_linux_virtual_machine.linux_vm : idx => vm
   } : {}
 
+  triggers = {
+    dns_zone_name = var.dns_zone_name
+    vm_id         = each.value.id
+  }
+
   provisioner "remote-exec" {
     inline = [
       "grep -q '\\.${var.dns_zone_name}$$' /etc/hostname || sudo sed -i 's/$/.${var.dns_zone_name}/' /etc/hostname && sudo systemctl restart systemd-hostnamed",
