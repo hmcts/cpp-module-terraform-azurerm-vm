@@ -478,7 +478,7 @@ resource "null_resource" "update_hostname" {
 
   provisioner "remote-exec" {
     inline = [
-      "grep -q '\\.${var.dns_zone_name}$$' /etc/hostname || sudo sed -i 's/$/.${var.dns_zone_name}/' /etc/hostname && sudo systemctl restart systemd-hostnamed",
+      "echo 'Adam'",
     ]
     connection {
       type        = "ssh"
