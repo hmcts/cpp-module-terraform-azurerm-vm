@@ -243,6 +243,11 @@ variable "generate_admin_ssh_key" {
   default     = false
 }
 
+variable "update_hostname" {
+  description = "Whether to append the DNS zone name to /etc/hostname to populate the FQDN"
+  default     = false
+}
+
 variable "admin_ssh_key_data" {
   description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
   default     = null
