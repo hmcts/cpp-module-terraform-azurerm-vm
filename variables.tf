@@ -245,7 +245,7 @@ variable "generate_admin_ssh_key" {
 
 variable "update_hostname" {
   description = "Whether to append the DNS zone name to /etc/hostname to populate the FQDN"
-  default     = true
+  default     = false
 }
 
 variable "admin_ssh_key_data" {
