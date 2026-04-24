@@ -375,6 +375,7 @@ resource "azurerm_managed_disk" "data_disk" {
   create_option        = length(each.value.data_disk.create_option) > 0 ? each.value.data_disk.create_option[each.value.vm_index] : "Empty"
   disk_size_gb         = each.value.data_disk.disk_size_gb
   source_resource_id   = length(each.value.data_disk.source_resource_id) > 0 ? each.value.data_disk.source_resource_id[each.value.vm_index] : null
+  zone                 = length(var.zones_list) > 0 ? var.zones_list[each.value.vm_index] : null
   tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
 }
 
