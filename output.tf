@@ -43,7 +43,7 @@ output "linux_vm_private_ips" {
 
 output "linux_virtual_machine_ids" {
   description = "The resource id's of all Linux Virtual Machine."
-  value       = var.os_flavor == "linux" ? concat(azurerm_linux_virtual_machine.linux_vm.*.id, [""]) : null
+  value       = var.os_flavor == "linux" ? azurerm_linux_virtual_machine.linux_vm[*].id : []
 }
 
 output "linux_virtual_machine_names" {
