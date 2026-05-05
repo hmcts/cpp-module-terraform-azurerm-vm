@@ -120,15 +120,15 @@ resource "azurerm_public_ip" "pip" {
 # Network Interface for Virtual Machine
 #---------------------------------------
 resource "azurerm_network_interface" "nic" {
-  count                         = var.instances_count
-  name                          = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}")
-  resource_group_name           = var.resource_group_name
-  location                      = var.location
-  dns_servers                   = var.dns_servers
-  enable_ip_forwarding          = var.enable_ip_forwarding
-  enable_accelerated_networking = var.enable_accelerated_networking
-  internal_dns_name_label       = var.internal_dns_name_label
-  tags                          = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
+  count                          = var.instances_count
+  name                           = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}")
+  resource_group_name            = var.resource_group_name
+  location                       = var.location
+  dns_servers                    = var.dns_servers
+  ip_forwarding_enabled          = var.enable_ip_forwarding
+  accelerated_networking_enabled = var.enable_accelerated_networking
+  internal_dns_name_label        = var.internal_dns_name_label
+  tags                           = merge({ "ResourceName" = upper("nic-vm${var.virtual_machine_name}${format("%02d", count.index + 1)}") }, var.tags, )
 
   ip_configuration {
     name                          = upper("ipconfig-${var.virtual_machine_name}${format("%02d", count.index + 1)}")
