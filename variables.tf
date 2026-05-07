@@ -874,3 +874,12 @@ variable "additional_ip_configs" {
   }))
   default = {}
 }
+
+variable "caching" {
+  description = "Caching mode for the OS disk"
+  type        = string
+  validation {
+    condition     = contains(["None", "ReadOnly", "ReadWrite"], var.caching)
+    error_message = "caching must be one of: None, ReadOnly, or ReadWrite."
+  }
+}

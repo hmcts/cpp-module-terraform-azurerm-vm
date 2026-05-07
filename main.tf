@@ -384,7 +384,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
   managed_disk_id    = azurerm_managed_disk.data_disk["${each.value.vmname}_${each.value.idx}"].id
   virtual_machine_id = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm[0].id : each.value.vmid
   lun                = each.value.idx
-  caching            = "ReadWrite"
+  caching            = var.caching
 }
 
 
