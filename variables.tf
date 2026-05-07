@@ -876,7 +876,7 @@ variable "additional_ip_configs" {
 }
 
 variable "caching" {
-  description = "Caching mode for the OS disk"
+  description = "The Type of Caching which should be used for the Data Disks. Possible values are `None`, `ReadOnly` and `ReadWrite`"
   type        = string
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.caching)
