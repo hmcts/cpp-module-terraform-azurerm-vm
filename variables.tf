@@ -874,3 +874,8 @@ variable "additional_ip_configs" {
   }))
   default = {}
 }
+
+variable "os_data_disk_caching" {
+  description = "The Type of Caching which should be used for the Internal OS Disk. Possible values are `None`, `ReadOnly` and `ReadWrite`"
+  default     = "ReadWrite"
+}
