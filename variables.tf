@@ -874,13 +874,3 @@ variable "additional_ip_configs" {
   }))
   default = {}
 }
-
-variable "os_disk_caching" {
-  type        = string
-  description = "The Type of Caching which should be used for the OS Disk. Possible values are `None`, `ReadOnly` and `ReadWrite`"
-  default     = "ReadWrite"
-  validation {
-    condition     = contains(["None", "ReadOnly", "ReadWrite"], var.caching)
-    error_message = "caching must be one of: None, ReadOnly, or ReadWrite."
-  }
-}
