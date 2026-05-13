@@ -6,7 +6,9 @@ This module supports to use existing NSG group. To enable this feature, specify 
 
 ## Backup Enrollment
 
-VMs with `service_criticality >= 4` can be automatically enrolled into a Recovery Services Vault. The backup policy is selected automatically based on criticality — criticality 4 and 5 use the `vm-crit4-5` policy.
+VMs with `service_criticality >= 4` can be automatically enrolled into a Recovery Services Vault. The backup policy is selected automatically based on criticality.
+
+To enroll, use recovery service vault module to create the vault and policy and pass the following vars to this module call:
 
 ```terraform
 module "recovery_services_vault" {
