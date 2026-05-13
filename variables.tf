@@ -874,3 +874,30 @@ variable "additional_ip_configs" {
   }))
   default = {}
 }
+
+# --------------------------------------------------
+# BACKUP
+# --------------------------------------------------
+
+variable "service_criticality" {
+  description = "Service criticality rating from 1-5. VMs with criticality >= 4 are enrolled in Recovery Services Vault backup when rsv_name and rsv_resource_group_name are provided."
+  type        = number
+  default     = 1
+
+  validation {
+    condition     = var.service_criticality >= 1 && var.service_criticality <= 5
+    error_message = "Service criticality must be between 1 and 5."
+  }
+}
+
+variable "rsv_name" {
+  description = "Name of the Recovery Services Vault to enroll this VM in. Required when service_criticality >= 4."
+  type        = string
+  default     = null
+}
+
+variable "rsv_resource_group_name" {
+  description = "Resource group name of the Recovery Services Vault. Required when service_criticality >= 4."
+  type        = string
+  default     = null
+}
