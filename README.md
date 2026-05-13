@@ -4,6 +4,44 @@ Terraform module to deploy azure Windows or Linux virtual machines with Public I
 
 This module supports to use existing NSG group. To enable this feature, specify the argument `existing_network_security_group_id` with a valid resource id of the current NSG group and remove all NSG inbound rules from the module.
 
+## Backup Enrollment
+
+VMs with `service_criticality >= 4` can be automatically enrolled into a Recovery Services Vault. The backup policy is selected automatically based on criticality — criticality 4 and 5 use the `vm-crit4-5` policy.
+
+```terraform
+module "recovery_services_vault" {
+  source = "git::https://github.com/hmcts/module-terraform-azurerm-recovery-services-vault.git?ref=main"
+
+  name                = "rsv-myapp-vm-prod"
+  resource_group_name = "RG-MYAPP-PROD"
+  tags                = var.tags
+}
+
+module "virtual_machine" {
+  source = "git::https://github.com/hmcts/cpp-module-terraform-azurerm-vm.git?ref=main"
+  # ...
+  service_criticality     = 5
+  rsv_name                = module.recovery_services_vault.recovery_vault_name
+  rsv_resource_group_name = module.recovery_services_vault.recovery_vault_resource_group_name
+}
+```
+
+If the RSV is managed in a separate repository, pass the vault details as plain strings:
+
+```terraform
+module "virtual_machine" {
+  source = "git::https://github.com/hmcts/cpp-module-terraform-azurerm-vm.git?ref=main"
+  # ...
+  service_criticality     = 5
+  rsv_name                = "rsv-myapp-vm-prod"
+  rsv_resource_group_name = "RG-MYAPP-PROD"
+}
+```
+
+When `instances_count > 1`, all VMs in the group are enrolled individually into the same vault and policy.
+
+Existing callers that do not set `service_criticality`, `rsv_name`, or `rsv_resource_group_name` are unaffected — no backup resources are created.
+
 ## Resources Supported
 
 * [Linux Virtual Machine](https://www.terraform.io/docs/providers/azurerm/r/linux_virtual_machine.html)
