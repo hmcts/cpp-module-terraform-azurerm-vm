@@ -865,6 +865,24 @@ variable "zones_list" {
   description = "List of availability zones"
 }
 
+variable "rsv_name" {
+  type        = string
+  default     = null
+  description = "Name of the Recovery Services Vault to enrol VMs into backup. When null (default), no backup enrollment is performed and existing behaviour is unchanged."
+}
+
+variable "rsv_resource_group_name" {
+  type        = string
+  default     = null
+  description = "Resource group of the Recovery Services Vault. Required when rsv_name is set."
+}
+
+variable "backup_policy_id" {
+  type        = string
+  default     = null
+  description = "Resource ID of the backup policy to assign to enrolled VMs. Required when rsv_name is set."
+}
+
 variable "additional_ip_configs" {
   description = "Additional IP configurations for the network interface"
   type = map(object({
