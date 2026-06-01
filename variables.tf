@@ -865,6 +865,12 @@ variable "zones_list" {
   description = "List of availability zones"
 }
 
+variable "enable_backup" {
+  type        = bool
+  default     = false
+  description = "Whether to enrol VMs into backup. Must be set to true alongside rsv_name, rsv_resource_group_name, and backup_policy_id."
+}
+
 variable "rsv_name" {
   type        = string
   default     = null
