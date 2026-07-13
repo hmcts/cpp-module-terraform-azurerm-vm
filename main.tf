@@ -201,6 +201,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   patch_mode                                             = var.patch_mode
   patch_assessment_mode                                  = var.patch_assessment_mode
   bypass_platform_safety_checks_on_user_schedule_enabled = var.bypass_platform_safety_checks_on_user_schedule_enabled
+  vm_agent_platform_updates_enabled                      = var.vm_agent_platform_updates_enabled
   zone                                                   = length(var.zones_list) > 0 ? var.zones_list[count.index] : var.vm_availability_zone
 
   tags = merge(

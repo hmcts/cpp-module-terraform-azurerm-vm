@@ -228,6 +228,11 @@ variable "bypass_platform_safety_checks_on_user_schedule_enabled" {
   default     = true
 }
 
+variable "vm_agent_platform_updates_enabled" {
+  description = "Specifies whether VMAgent Platform Updates are enabled for the Linux Virtual Machine."
+  default     = false
+}
+
 variable "license_type" {
   description = "Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are None, Windows_Client and Windows_Server."
   default     = "None"
