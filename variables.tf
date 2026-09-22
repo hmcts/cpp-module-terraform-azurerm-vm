@@ -18,8 +18,12 @@ variable "location" {
   default     = "uksouth"
 }
 
+# DEPRECATED: no longer used by the module. The network is taken from
+# subnet_id, which the caller passes directly. Kept so existing consumers
+# do not break; remove once elasticsearch, artemis, barracuda-ngf, waf and
+# hvault have stopped passing it.
 variable "virtual_network_name" {
-  description = "The name of the virtual network"
+  description = "(deprecated, unused) The name of the virtual network"
   default     = ""
 
   validation {
@@ -28,8 +32,12 @@ variable "virtual_network_name" {
   }
 }
 
+# DEPRECATED: no longer used by the module. The network is taken from
+# subnet_id, which the caller passes directly. Kept so existing consumers
+# do not break; remove once elasticsearch, artemis, barracuda-ngf, waf and
+# hvault have stopped passing it.
 variable "virtual_network_rg_name" {
-  description = "The name of the virtual network resource group"
+  description = "(deprecated, unused) The name of the virtual network resource group"
   default     = ""
 
   validation {
@@ -38,8 +46,12 @@ variable "virtual_network_rg_name" {
   }
 }
 
+# DEPRECATED: no longer used by the module. The network is taken from
+# subnet_id, which the caller passes directly. Kept so existing consumers
+# do not break; remove once elasticsearch, artemis, barracuda-ngf, waf and
+# hvault have stopped passing it.
 variable "subnet_name" {
-  description = "The name of the subnet to use in VM "
+  description = "(deprecated, unused) The name of the subnet to use in VM "
   default     = ""
 
   validation {
